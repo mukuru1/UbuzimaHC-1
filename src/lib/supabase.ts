@@ -4,8 +4,25 @@ import { Database } from '../types/database';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+// Validate environment variables
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables. Please check your .env file and ensure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set.');
+}
+
+// Check for placeholder values
+if (supabaseUrl.includes('your_supabase_project_url_here') || supabaseUrl === 'your_supabase_project_url_here') {
+  throw new Error('Please replace the placeholder VITE_SUPABASE_URL in your .env file with your actual Supabase project URL. You can find this in your Supabase project settings under API.');
+}
+
+if (supabaseAnonKey.includes('your_supabase_anon_key_here') || supabaseAnonKey === 'your_supabase_anon_key_here') {
+  throw new Error('Please replace the placeholder VITE_SUPABASE_ANON_KEY in your .env file with your actual Supabase anonymous key. You can find this in your Supabase project settings under API.');
+}
+
+// Validate URL format
+try {
+  new URL(supabaseUrl);
+} catch (error) {
+  throw new Error(`Invalid VITE_SUPABASE_URL format: "${supabaseUrl}". Please ensure it's a valid URL (e.g., https://your-project-ref.supabase.co)`);
 }
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
