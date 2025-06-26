@@ -88,41 +88,56 @@ export const useAuth = () => {
     sector?: string;
     cell?: string;
   }) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: userData
-      }
-    });
-
-    if (error) throw error;
-
-    // Create user profile in our users table
-    if (data.user) {
-      await dbHelpers.createUser({
-        id: data.user.id,
+    try {
+      const { data, error } = await supabase.auth.signUp({
         email,
-        ...userData
+        password,
+        options: {
+          data: userData
+        }
       });
-    }
 
-    return data;
+      if (error) throw error;
+
+      // Create user profile in our users table
+      if (data.user) {
+        await dbHelpers.createUser({
+          id: data.user.id,
+          email,
+          ...userData
+        });
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Signup error:', error);
+      throw error;
+    }
   };
 
   const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) throw error;
-    return data;
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Signin error:', error);
+      throw error;
+    }
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+    } catch (error) {
+      console.error('Signout error:', error);
+      throw error;
+    }
   };
 
   const updateProfile = async (updates: {
@@ -138,22 +153,27 @@ export const useAuth = () => {
   }) => {
     if (!user) throw new Error('No user logged in');
 
-    const { data, error } = await supabase
-      .from('users')
-      .update(updates)
-      .eq('id', user.id)
-      .select()
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .update(updates)
+        .eq('id', user.id)
+        .select()
+        .single();
 
-    if (error) throw error;
+      if (error) throw error;
 
-    // Update local user state
-    setUser({
-      ...user,
-      profile: { ...user.profile, ...data }
-    });
+      // Update local user state
+      setUser({
+        ...user,
+        profile: { ...user.profile, ...data }
+      });
 
-    return data;
+      return data;
+    } catch (error) {
+      console.error('Profile update error:', error);
+      throw error;
+    }
   };
 
   return {

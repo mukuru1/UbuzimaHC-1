@@ -12,6 +12,7 @@ import UserProfile from './components/profile/UserProfile';
 import Settings from './components/settings/Settings';
 import MedicalRecords from './components/medical-records/MedicalRecords';
 import PatientDashboard from './components/dashboard/PatientDashboard';
+import EnvironmentCheck from './components/EnvironmentCheck';
 
 const AppContent: React.FC = () => {
   const { currentView } = useApp();
@@ -47,6 +48,7 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <EnvironmentCheck />
       <Header />
       {renderCurrentView()}
     </div>
